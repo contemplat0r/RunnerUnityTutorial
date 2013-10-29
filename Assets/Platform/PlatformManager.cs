@@ -2,17 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class SkylineManager : MonoBehaviour {
+public class PlatformManager : MonoBehaviour {
+
 	public Transform prefab;
 	
 	public int numberOfObjects;
 	public float recycleOffset;
 	
 	public Vector3 startPosition;
-	public Vector3 minSize, maxSize;
+	public Vector3 minSize, maxSize, minGap, maxGap;
+	public float minY, maxY;
 	
 	private Vector3 nextPosition;
 	private Queue<Transform> objectQueue;
+	
+	public Material[] materials;
+	public PhysicMaterial[] physicMaterials;
 
 	// Use this for initialization
 	
@@ -50,7 +55,22 @@ public class SkylineManager : MonoBehaviour {
 		Transform o = objectQueue.Dequeue();
 		o.localScale = scale;
 		o.localPosition = position;
-		nextPosition.x += scale.x;
+		//nextPosition.x += scale.x;
+		int materialIndex = Random.Range(0, materials.Length);
+		o.renderer.material = materials[materialIndex];
+		o.collider.material = physicMaterials[materialIndex];
 		objectQueue.Enqueue(o);	
+		
+		nextPosition += new Vector3(
+			Random.Range(minGap.x, maxGap.x) + scale.x,
+			Random.Range(minGap.y, maxGap.y),
+			Random.Range(minGap.z, maxGap.z));
+		
+		if (nextPosition.y < minY) {
+			nextPosition.y = minY + maxGap.y;
+		}
+		if (nextPosition.y > maxY) {
+			nextPosition.y = maxY - maxGap.y;
+		}	
 	}
 }
