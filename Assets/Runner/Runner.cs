@@ -6,12 +6,33 @@ public class Runner : MonoBehaviour {
 	public static float distanceTraveled;
 	public float acceleration;
 	private bool touchingPlatform;
+	public float gameOverY;
 	public Vector3 jumpVelocity;
+	private Vector3 startPosition;
 
 	// Use this for initialization
-	/*void Start () {
+	void Start () {
+		GameEventManger.GameStart += GameStart;
+		GameEventManger.GameOver += gameOverY;
+		startPosition = transform.localPosition;
+		renderer.enabled = false;
+		rigidbody.isKinematic = true;
+		enabled = false;
+	}
 	
-	}*/
+	private void GameStart () {
+		distanceTraveled = 0f;
+		transform.localPosition = startPosition;
+		renderer.enabled = true;
+		rigidbody.isKinematic = false;
+		enabled = true;
+	}
+	
+	private void GameOver () {
+		renderer.enabled = false;
+		rigidbody.isKinematic = true;
+		enabled = false;
+	}
 	
 	// Update is called once per frame
 	void Update () {
@@ -21,6 +42,10 @@ public class Runner : MonoBehaviour {
 			touchingPlatform = false;
 		}
 		distanceTraveled = transform.localPosition.x;
+		
+		if (transform.localPosition.y < gameOverY) {
+			GameEventManger.TriggerGameOver();
+		}
 	}
 	
 	void FixedUpdate () {
