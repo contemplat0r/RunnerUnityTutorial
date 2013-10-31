@@ -17,18 +17,21 @@ public class SkylineManager : MonoBehaviour {
 	// Use this for initialization
 	
 	public void Start () {
+		GameEventManger.GameStart += GameStart;
+		GameEventManger.GameOver += GameOver;
 		objectQueue = new Queue<Transform> (numberOfObjects);
 		for (int i = 0; i < numberOfObjects; i++) {
-			objectQueue.Enqueue((Transform)Instantiate(prefab));
+			objectQueue.Enqueue((Transform)Instantiate(prefab, new Vector3(0f, 0f, -100f), Quaternion.identity));
 		}
-		nextPosition = startPosition;
+		enabled = false;
+		/*nextPosition = startPosition;
 		for (int i = 0; i < numberOfObjects; i++) {
 			//Transform o = (Transform)Instantiate(prefab);
 			//o.localPosition = nextPosition;
 			//nextPosition.x += o.localScale.x;
 			//objectQueue.Enqueue(o);
 			Recycle();
-		}
+		}*/
 	}
 	
 	public void Update () {
@@ -52,5 +55,18 @@ public class SkylineManager : MonoBehaviour {
 		o.localPosition = position;
 		nextPosition.x += scale.x;
 		objectQueue.Enqueue(o);	
+	}
+	
+	private void GameStart () {
+		nextPosition = startPosition;
+		
+		for (int i = 0; i < numberOfObjects; i++) {
+			Recycle();
+		}
+		enabled = true;
+	}
+	
+	private void GameOver () {
+		enabled = false;
 	}
 }

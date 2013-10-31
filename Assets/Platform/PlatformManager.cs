@@ -18,22 +18,28 @@ public class PlatformManager : MonoBehaviour {
 	
 	public Material[] materials;
 	public PhysicMaterial[] physicMaterials;
+	
+	public Booster booster;
 
 	// Use this for initialization
 	
 	public void Start () {
+		GameEventManger.GameStart += GameStart;
+		GameEventManger.GameOver += GameOver;
 		objectQueue = new Queue<Transform> (numberOfObjects);
 		for (int i = 0; i < numberOfObjects; i++) {
-			objectQueue.Enqueue((Transform)Instantiate(prefab));
+			//objectQueue.Enqueue((Transform)Instantiate(prefab));
+			objectQueue.Enqueue((Transform)Instantiate(prefab, new Vector3(0f, 0f, -100f), Quaternion.identity));
 		}
-		nextPosition = startPosition;
+		/*nextPosition = startPosition;
 		for (int i = 0; i < numberOfObjects; i++) {
 			//Transform o = (Transform)Instantiate(prefab);
 			//o.localPosition = nextPosition;
 			//nextPosition.x += o.localScale.x;
 			//objectQueue.Enqueue(o);
 			Recycle();
-		}
+		}*/
+		enabled = false;
 	}
 	
 	public void Update () {
@@ -51,6 +57,7 @@ public class PlatformManager : MonoBehaviour {
 		Vector3 position = nextPosition;
 		position.x += 0.5f * scale.x;
 		position.y += 0.5f * scale.y;
+		booster.SpawnIfAvailable(position);
 		
 		Transform o = objectQueue.Dequeue();
 		o.localScale = scale;
@@ -72,5 +79,18 @@ public class PlatformManager : MonoBehaviour {
 		if (nextPosition.y > maxY) {
 			nextPosition.y = maxY - maxGap.y;
 		}	
+	}
+	
+	private void GameStart () {
+		nextPosition = startPosition;
+		
+		for (int i = 0; i < numberOfObjects; i++) {
+			Recycle();
+		}
+		enabled = true;
+	}
+	
+	private void GameOver () {
+		enabled = false;
 	}
 }
